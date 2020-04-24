@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Java后端WebSocket的Tomcat实现</title>
+    <style>
+        body {
+            border: 0;
+            padding: 4%;
+            margin: 0;
+
+        }
+    </style>
+</head>
+<body>
+Welcome<br/><input id="text" type="text"/>
+<button id="send-btn">发送消息</button>
+<hr/>
+<button id="close-btn">关闭WebSocket连接</button>
+<hr/>
+<div id="message"></div>
+</body>
+<script type="text/javascript" src="./js/websocketUtil.js"></script>
+<script type="text/javascript">
+    var message = document.getElementById('message');
+    var text = document.getElementById('text');
+    var closeBtn = document.getElementById('close-btn');
+    var sendBtn = document.getElementById('send-btn');
+
+    window.onload = function (ev) {
+        closeBtn.onclick = function (ev1) {
+            closeWebSocket();
+        };
+
+        sendBtn.onclick = function (ev1) {
+            send(text.value);
+        };
+    };
+</script>
+</html>

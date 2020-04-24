@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Title</title>
+    <style>
+        body {
+            border: 0;
+            padding: 4%;
+            margin: 0;
+        }
+
+        #head-container {
+            width: 190px;
+            padding-bottom: 10px;
+            margin: 30px auto;
+        }
+
+        #head-image {
+            max-width: 190px;
+            max-height: 190px;
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="head-container">
+    <h3 id="nike-name">昵称</h3>
+    <img src="./image/P_XNH_04.png" id="head-image"/>
+
+
+</div>
+</body>
+<script type="text/javascript" src="./js/websocketUtil.js"></script>
+<script type="text/javascript" src="./js/touchEvent.js"></script>
+<script type="text/javascript">
+    window.onload = function (ev) {
+
+        send(JSON.stringify(jsonTest("pablo" + Math.round(Math.random() * 50), 'Insert')));
+    };
+
+    function jsonTest(username, type) {
+        var user = {
+            code: '2',
+            data: {
+                type: type,
+                user: {
+                    openID: "awjhndjkawnkdjnawjkd",
+                    name: username,
+                    imageUri: "http://192.168.31.168:8081/HDDTProject/image/P_XNH_04.png"
+                }
+            }
+        };
+
+        return user;
+    }
+</script>
+</html>
