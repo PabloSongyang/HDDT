@@ -10,7 +10,7 @@ import javax.websocket.server.ServerEndpointConfig;
  * @company 大连创模科技
  * @time 2020/4/24 16:02
  * @package com.creative.answer.config
- * @characterization 在这里添加类的功能描述
+ * @characterization 通过GetHttpSessionConfigurator获取HttpSession
  */
 public class GetHttpSessionConfigurator extends ServerEndpointConfig.Configurator {
     @Override

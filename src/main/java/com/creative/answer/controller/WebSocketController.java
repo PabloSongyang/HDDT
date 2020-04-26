@@ -1,13 +1,12 @@
-package com.creative.answer.socket;
+package com.creative.answer.controller;
 
-import com.creative.answer.bean.BigScreenBean;
-import com.creative.answer.common.util.JsonUtil;
-import com.creative.answer.config.GetHttpSessionConfigurator;
+import com.creative.answer.config.CodeConfig;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -24,16 +23,27 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @ServerEndpoint 注解是一个类层次的注解，它的功能主要是将目前的类定义成一个websocket服务器端,
  * 注解的值将被用于监听用户连接的终端访问URL地址,客户端可以通过这个URL来连接到WebSocket服务器端
  */
-@ServerEndpoint(value = "/websocket",configurator = GetHttpSessionConfigurator.class)
-public class WebSocketManager {
+@ServerEndpoint("/websocket")
+public class WebSocketController {
+//    private static WebSocketController singleton = null;
+//
+//    public static WebSocketController getInstance(){
+//        synchronized (WebSocketController.class){
+//            if (singleton == null)
+//                singleton = new WebSocketController();
+//        }
+//        return singleton;
+//    }
+
+
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
-    private static CopyOnWriteArraySet<WebSocketManager> webSocketManagerCopyOnWriteArraySet = new CopyOnWriteArraySet<>();
+    private static CopyOnWriteArraySet<WebSocketController> webSocketManagerCopyOnWriteArraySet = new CopyOnWriteArraySet<>();
 
     //
-    private static Map<String,HttpSession> socketNumb = new ConcurrentHashMap<>();
+    private static Map<String, HttpSession> socketNumb = new ConcurrentHashMap<>();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
@@ -41,7 +51,12 @@ public class WebSocketManager {
     //整个会话
     private HttpSession httpSession;
 
-    private static boolean isBigScreen = false;
+    //消息管理map
+    private Map<CodeConfig, Object> codeConfigObjectMap = new HashMap<>();
+
+    public Map<CodeConfig, Object> getCodeConfigObjectMap() {
+        return codeConfigObjectMap;
+    }
 
     /**
      * 连接建立成功调用
@@ -49,13 +64,22 @@ public class WebSocketManager {
      * @param session session为某个客户端连接会话，需要通过其给客户端发送数据，session可选
      */
     @OnOpen
-    public void onOpen(Session session,EndpointConfig endpointConfig) {
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
         this.session = session;
         this.httpSession = (HttpSession) endpointConfig.getUserProperties().get(HttpSession.class.getName());
         webSocketManagerCopyOnWriteArraySet.add(this);
-        WebSocketManager.addOnlineCount();
+        WebSocketController.addOnlineCount();
 
-        System.out.println("有新的连接加入了，当前在线人数为：" + WebSocketManager.getOnlineCount());
+        System.out.println("有新的连接加入了，当前在线人数为：" + WebSocketController.getOnlineCount());
+    }
+
+    /**
+     * 返回当前session
+     *
+     * @return
+     */
+    public Session getSession() {
+        return this.session;
     }
 
     /**
@@ -64,8 +88,8 @@ public class WebSocketManager {
     @OnClose
     public void onClose() {
         webSocketManagerCopyOnWriteArraySet.remove(this);
-        WebSocketManager.subOnlineCount();
-        System.out.println("有一连接关闭，当前在线人数为：" + WebSocketManager.getOnlineCount());
+        WebSocketController.subOnlineCount();
+        System.out.println("有一连接关闭，当前在线人数为：" + WebSocketController.getOnlineCount());
     }
 
     /**
@@ -76,13 +100,18 @@ public class WebSocketManager {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("收到来自客户端的消息：" + message);
-
+//        System.out.println("收到来自客户端的消息：" + message);
+        String json = QuestionController.getInstance().onMessage(message,session);
+        try {
+            this.sendMessage(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         /**
          * 消息群发
          */
-        for (WebSocketManager webSocketManager : webSocketManagerCopyOnWriteArraySet) {
+        for (WebSocketController webSocketManager : webSocketManagerCopyOnWriteArraySet) {
             try {
                 webSocketManager.sendMessage(message);
             } catch (IOException e) {
@@ -127,7 +156,7 @@ public class WebSocketManager {
      * 在线+1
      */
     public static synchronized void addOnlineCount() {
-        onlineCount = WebSocketManager.getOnlineCount();
+        onlineCount = WebSocketController.getOnlineCount();
         onlineCount++;
     }
 
@@ -135,7 +164,7 @@ public class WebSocketManager {
      * 在线-1
      */
     public static synchronized void subOnlineCount() {
-        onlineCount = WebSocketManager.getOnlineCount();
+        onlineCount = WebSocketController.getOnlineCount();
         onlineCount--;
     }
 }
