@@ -1,9 +1,14 @@
 package com.creative.answer.controller;
 
+import com.creative.answer.Service.AnswerService;
 import com.creative.answer.Service.QuestionService;
+import com.creative.answer.Service.impl.AnswerServiceImpl;
 import com.creative.answer.Service.impl.QuestionServiceImpl;
+import com.creative.answer.bean.AnswerBean;
 import com.creative.answer.bean.QuestionBean;
-import com.creative.answer.bean.QuestionCountBean;
+import com.creative.answer.bean.QuestionFromUnityBean;
+import com.creative.answer.common.CommonData;
+import com.creative.answer.config.CodeConfig;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -20,10 +25,12 @@ import java.util.List;
  * @characterization 题目控制层
  */
 
-public class QuestionController extends BaseController {
+public class QuestionController extends BaseController{
     private static QuestionController singleton = null;
     private QuestionService questionService = new QuestionServiceImpl();
+    private AnswerService answerService = new AnswerServiceImpl();
     private Gson gson = new Gson();
+    private boolean isStart = false;
 
     public static QuestionController getInstance() {
         synchronized (QuestionController.class) {
@@ -33,20 +40,22 @@ public class QuestionController extends BaseController {
         return singleton;
     }
 
-    public void getAllQuestions() {
-    }
-
+    /**
+     * 获取消息
+     *
+     * @param message
+     * @param session
+     * @return
+     */
     public String onMessage(String message, Session session) {
-//        List<QuestionBean> questionBeanList = questionService.getAllQuestions();
-//        gson.toJson(questionBeanList);
-        String json = "";
-
+        String sendJson = "";
+//        CommonData.isStart = false;
         System.out.println("unity发来消息：" + message);
         if (message.contains("code")) {
 
-            QuestionCountBean o = null;
+            QuestionFromUnityBean o = null;
             try {
-                o = gson.fromJson(message, new TypeToken<QuestionCountBean>() {
+                o = gson.fromJson(message, new TypeToken<QuestionFromUnityBean>() {
                 }.getType());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -54,40 +63,84 @@ public class QuestionController extends BaseController {
 
 
             switch (o.code) {
-                case 2:
-
-                    break;
-                case 8:
+                //请求题目数量及内容
+                case CodeConfig.GET_ALL_QUESTIONS:
                     super.getResultMap().clear();
                     List<QuestionBean> questionBeanList = new ArrayList<>();
                     switch (o.data.Count) {
                         case "20":
                             questionBeanList = questionService.getAllQuestions(Integer.parseInt(o.data.Count));
-
-                            System.out.println(questionBeanList.size());
                             break;
                         case "40":
                             questionBeanList = questionService.getAllQuestions(Integer.parseInt(o.data.Count));
-                            System.out.println(questionBeanList.size());
                             break;
                         case "60":
                             questionBeanList = questionService.getAllQuestions(Integer.parseInt(o.data.Count));
-                            System.out.println(questionBeanList.size());
                             break;
                     }
-                    if (questionBeanList.size() > 0){
-                        super.getResultMap().put("msg","发送成功");
-                        super.getResultMap().put("code",1);
-                        super.getResultMap().put("question",questionBeanList);
+                    if (questionBeanList.size() > 0) {
+                        super.getResultMap().put("msg", "ok");
+                        super.getResultMap().put("code", 8);
+                        super.getResultMap().put("flag", CodeConfig.GET_ALL_QUESTIONS);
+                        super.getResultMap().put("question", questionBeanList);
                     }
-                    json = "发给unityjson：" + gson.toJson(super.getResultMap());
+                    sendJson = gson.toJson(super.getResultMap());
+                    System.out.println(sendJson);
+                    break;
+
+                //请求题目选项数据
+                case CodeConfig.GET_ALL_OPTIONS:
+                    super.getResultMap().clear();
+                    String questionId = o.data.id;
+                    System.out.println("questionId ==>> " + questionId);
+                    List<AnswerBean> answerBeanList = answerService.getAnswerOptionsByQuestionsID(questionId);
+                    if (answerBeanList.size() > 0) {
+                        super.getResultMap().put("msg", "ok");
+                        super.getResultMap().put("code", 9);
+                        super.getResultMap().put("flag", CodeConfig.GET_ALL_OPTIONS);
+                        super.getResultMap().put("option", answerBeanList);
+                    }
+                    sendJson = gson.toJson(super.getResultMap());
+                    System.out.println(sendJson);
+                    break;
+
+                case CodeConfig.GET_START_QUESTIONS:
+//                    CommonData.isStart = true;
+                    super.getResultMap().clear();
+                    if ("start".equals(o.data.status)) {
+                        super.getResultMap().put("time", 3);
+                        super.getResultMap().put("code", 3);
+                        super.getResultMap().put("number", 2);
+                        super.getResultMap().put("state", CommonData.state);
+                    }
+                    sendJson = gson.toJson(super.getResultMap());
+                    System.out.println(sendJson);
+                case 1004:
+
                     break;
             }
         }
-        return json;
+        return sendJson;
     }
 
-    public void sendMessage(String message) throws IOException {
-
+    public boolean reqStart(){
+        return isStart;
     }
+
+//
+//    @Override
+//    public void run() {
+//        Thread.currentThread().setName("CUTDOWN");
+//        System.out.println("执行答题倒计时线程");
+////        int count = 20;
+////        for (int i = 20; i >= 0; i--) {
+////            count = i;
+////            System.out.println(count);
+////            try {
+////                Thread.sleep(1000);
+////            } catch (InterruptedException e) {
+////                e.printStackTrace();
+////            }
+////        }
+//    }
 }

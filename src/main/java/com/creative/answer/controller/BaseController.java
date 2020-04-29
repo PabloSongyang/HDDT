@@ -10,7 +10,7 @@ import java.util.Map;
  * @package com.creative.answer.controller
  * @characterization 控制器父类
  */
-public class BaseController {
+public class BaseController{
     private Map<String, Object> resultMap = new HashMap<>();
 
     public Map<String, Object> getResultMap() {

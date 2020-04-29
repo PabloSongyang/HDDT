@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
-    <title>Title</title>
+    <title>互动答题</title>
     <style>
         body {
             border: 0;
@@ -28,32 +28,54 @@
         h3 {
             text-align: center;
         }
+
+        #tips {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <div id="head-container">
     <h3 id="nike-name">昵称</h3>
     <img src="./image/P_XNH_04.png" id="head-image"/>
+</div>
 
-
+<div id="tips">
+    请等待开始答题……
 </div>
 </body>
+<script type="text/javascript" src="./js/generateUUID.js"></script>
 <script type="text/javascript" src="./js/websocketUtil.js"></script>
 <script type="text/javascript" src="./js/touchEvent.js"></script>
 <script type="text/javascript">
-    window.onload = function (ev) {
+    var name = "pablo" + Math.round(Math.random() * 50)
+    window.onload = function () {
 
-        send(JSON.stringify(jsonTest("pablo" + Math.round(Math.random() * 50), 'Insert')));
+        send(JSON.stringify(jsonTest(2, name, 'insert')), 1);
+
+        onMessage(function (data) {
+            var jsonData = (JSON.parse(data));
+            if (jsonData.hasOwnProperty("code")) {
+                if (Number(jsonData["code"]) == 1003) {
+                    window.location.href = "answer.html";
+                }
+            }
+        });
+
+
     };
 
-    function jsonTest(username, type) {
+    window.onunload = function (ev) {
+        send(JSON.stringify(jsonTest(0, name, 'delete')), 2)
+    };
+
+    function jsonTest(code, username, type) {
         var user = {
-            code: '2',
+            code: code,
             data: {
                 type: type,
                 user: {
-                    openID: "awjhndjkawnkdjnawjkd",
-
+                    uuid: UUID,
                     name: username,
                     imageUri: "http://192.168.31.168:8081/HDDTProject/image/P_XNH_04.png"
                 }

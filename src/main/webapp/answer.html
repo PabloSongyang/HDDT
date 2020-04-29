@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <title>快问快答</title>
+    <style>
+        body {
+            border: 0;
+            padding: 4%;
+            margin: 0;
+            background-color: #FECA59FF;
+        }
+
+        #head-container {
+            width: 150px;
+            padding-bottom: 10px;
+            margin: 30px auto;
+        }
+
+        #head-image {
+            max-width: 190px;
+            max-height: 190px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        #answer-container {
+            /*border: 1px solid darkblue;*/
+            text-align: center;
+        }
+
+        ul {
+            display: inline-block;
+            width: 90%;
+        }
+
+        ul li {
+            list-style-type: none;
+            margin-top: 20px;
+        }
+
+        .option {
+            margin-top: 0px;
+            float: left;
+            border: 1px solid sienna;
+
+            height: 50px;
+            width: 70%;
+            line-height: 50px;
+            background-color: cornsilk;
+            border-radius: 10px;
+            margin-right: 30px;
+        }
+
+        #tips, #time-cut-down {
+            font-size: 20px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .result {
+
+            float: right;
+            width: 25px;
+            margin: 10px 20px 0 0;
+
+
+        }
+
+        .option-container {
+            clear: both;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+<div id="head-container">
+    <h3 id="nike-name">昵称</h3>
+    <img src="./image/P_XNH_04.png" id="head-image"/>
+</div>
+<div id="tips">
+    请等待……
+</div>
+<div id="time-cut-down">
+    20s
+</div>
+<div id="answer-container">
+    <ul id="options-ul">
+        <!--<li>-->
+            <!--<div class="option-container">-->
+                <!--<div class="option">C</div>-->
+                <!--<div class="result">-->
+                    <!--<img src="./image/Ture.png" width="30px">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="option-container">-->
+                <!--<div class="option">C</div>-->
+                <!--<div class="result">-->
+                    <!--<img src="./image/Ture.png" width="30px">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="option-container">-->
+                <!--<div class="option">C</div>-->
+                <!--<div class="result">-->
+                    <!--<img src="./image/Ture.png" width="30px">-->
+                <!--</div>-->
+            <!--</div>-->
+
+
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="option-container">-->
+                <!--<div class="option">C</div>-->
+                <!--<div class="result">-->
+                    <!--<img src="./image/Ture.png" width="30px">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</li>-->
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="./js/websocketUtil.js"></script>
+<script type="text/javascript" src="./js/touchEvent.js"></script>
+<script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+    var nikeName = $('#nike-name');
+    var headImage = $('#head-image');
+    var timeCutDown = $('#time-cut-down');
+    var ulContainer = $('#options-ul');
+    var options = ["A", "B", "C", "D"];
+
+    $(function () {
+        onMessage(function (data) {
+            var jsonData = (JSON.parse(data));
+            if (jsonData.hasOwnProperty("code")) {
+
+                switch (Number(jsonData["code"])) {
+                    //获取所有的题目数据
+                    case 1001:
+                        break;
+                    //获取所有的题目对应选项
+                    case 1002:
+                        break;
+                    //用户点击选项按钮
+                    case 1003:
+                        ulContainer.off('click', clickEvent);
+                        ulContainer.on('click', 'li', clickEvent);
+                        break;
+                    //获取选项个数
+                    case 1004:
+                        ulContainer.empty();
+                        for (var i = 0; i < Number(jsonData["data"]["questionCount"]); i++) {
+                            var li = $('<li></li>');
+                            var option_container = $('<div class="option-container"></div>');
+                            var option = $('<div class="option"></div>').text(options[i]);
+                            var result = $('<div class="result"></div>');
+                            var optionImg = $('<img/>').attr({'src': './image/Ture.png', 'width': "30px"});
+
+
+                            li.attr("id", i);
+                            result.css('display','none');
+
+                            result.append(optionImg);
+                            option_container.append(option).append(result);
+                            li.append(option_container);
+                            ulContainer.append(li);
+                        }
+                        break;
+                    //获取倒计时信息
+                    case 1005:
+                        timeCutDown.text(jsonData["data"]["cutDown"] + 's');
+                        break;
+                    //获取当前题的正确选项
+                    case 1006:
+                        var index = 0;
+                        for (let i = 0; i < options.length; i++) {
+                            if (jsonData["data"]["rightOption"].toString() == options[i]){
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        ulContainer.children('li').eq(index).find('.result').eq(0).css('display','');
+                        break;
+                }
+            }
+
+        });
+
+    });
+
+    function clickEvent() {
+
+        console.log($(this).index());
+        ulContainer.children('li').eq($(this).index()).children('div').css("background-color", "slategrey");
+        send(JSON.stringify(answered(options[$(this).index()], 1)), 2);
+        // var id = ulContainer.children('li').eq($(this).index()).attr('id');
+        // for (var i = 0; i < ulContainer.children('li').length; i++) {
+        //     if (id != ulContainer.children('li').eq(i).attr('id')){
+        //         ulContainer.children('li').eq(i).children('div').css("background-color","cornsilk")
+        //         ulContainer.off('click',clickEvent);
+        //     }
+        // }
+    }
+
+    function answered(result, isAnswered) {
+        var json = {
+            code: 11,
+            result: result,
+            isAnswered: isAnswered,
+            sessionId: document.cookie
+        };
+        return json;
+    }
+</script>
+</html>

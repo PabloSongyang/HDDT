@@ -8,6 +8,8 @@ package com.creative.answer.common;
  * @characterization 通用属性
  */
 public class CommonData {
-
+    public static int state = 1;
+    public static int timeCutDown = 20;
+    public static boolean isStart = false;
     public static String big_screen = "";
 }

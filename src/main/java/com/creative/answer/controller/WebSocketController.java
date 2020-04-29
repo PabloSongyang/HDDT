@@ -1,5 +1,6 @@
 package com.creative.answer.controller;
 
+import com.creative.answer.common.CommonData;
 import com.creative.answer.config.CodeConfig;
 
 import javax.servlet.http.HttpSession;
@@ -100,13 +101,34 @@ public class WebSocketController {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-//        System.out.println("收到来自客户端的消息：" + message);
-        String json = QuestionController.getInstance().onMessage(message,session);
+        System.out.println("收到来自客户端的消息：" + message);
+        String json = QuestionController.getInstance().onMessage(message, session);
         try {
             this.sendMessage(json);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+//        int timeCutDown = 21;
+//        while (CommonData.isStart) {
+//            try {
+//                if (timeCutDown > 0) {
+//                    --timeCutDown;
+//                    this.sendMessage("{\"number\":2,\"code\":3,\"time\":" + timeCutDown + ",\"state\":1}");
+//
+//                } else {
+//                    CommonData.isStart = false;
+//                    this.sendMessage("{\"number\":2,\"code\":3,\"time\":" + timeCutDown + ",\"state\":0}");
+//                    break;
+//                }
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
 
         /**
          * 消息群发

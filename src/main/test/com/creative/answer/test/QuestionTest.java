@@ -5,6 +5,8 @@ import com.creative.answer.Service.impl.QuestionServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+
 /**
  * @author Pablo.风暴洋
  * @company 大连创模科技
@@ -28,5 +30,25 @@ public class QuestionTest {
     @Test
     public void getQuestionByNumberTest(){
         System.out.println(questionService.getQuestionByNumber(1));
+    }
+
+    @Test
+    public void update(){
+        int time = 6;
+        while (true){
+//            System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
+            if (time > 0){
+                --time;
+                System.out.println(time);
+            }else{
+                System.out.println("时间到");
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
