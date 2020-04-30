@@ -27,16 +27,20 @@ if (window.WebSocket) {
      * @param callback
      */
     function onMessage(callback) {
+
         //收到消息回调
         websocket.onmessage = function (ev) {
-            if (ev.data != '') {
-                var c = ev.data;
-                callback(c);
-                setMessageInnerHTML(ev.data);
+            if (websocket.readyState != websocket.OPEN)
+                return
+            else {
+                if (ev.data != '') {
+                    var c = ev.data;
+                    callback(c);
+                    setMessageInnerHTML(ev.data);
+                }
             }
         };
     }
-
 
     //连接关闭回调
     websocket.onclose = function () {

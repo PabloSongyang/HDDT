@@ -30,7 +30,6 @@ public class QuestionController extends BaseController{
     private QuestionService questionService = new QuestionServiceImpl();
     private AnswerService answerService = new AnswerServiceImpl();
     private Gson gson = new Gson();
-    private boolean isStart = false;
 
     public static QuestionController getInstance() {
         synchronized (QuestionController.class) {
@@ -108,7 +107,7 @@ public class QuestionController extends BaseController{
 //                    CommonData.isStart = true;
                     super.getResultMap().clear();
                     if ("start".equals(o.data.status)) {
-                        super.getResultMap().put("time", 3);
+                        super.getResultMap().put("time", 20);
                         super.getResultMap().put("code", 3);
                         super.getResultMap().put("number", 2);
                         super.getResultMap().put("state", CommonData.state);
@@ -123,24 +122,4 @@ public class QuestionController extends BaseController{
         return sendJson;
     }
 
-    public boolean reqStart(){
-        return isStart;
-    }
-
-//
-//    @Override
-//    public void run() {
-//        Thread.currentThread().setName("CUTDOWN");
-//        System.out.println("执行答题倒计时线程");
-////        int count = 20;
-////        for (int i = 20; i >= 0; i--) {
-////            count = i;
-////            System.out.println(count);
-////            try {
-////                Thread.sleep(1000);
-////            } catch (InterruptedException e) {
-////                e.printStackTrace();
-////            }
-////        }
-//    }
 }

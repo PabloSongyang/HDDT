@@ -109,27 +109,6 @@ public class WebSocketController {
             e.printStackTrace();
         }
 
-//        int timeCutDown = 21;
-//        while (CommonData.isStart) {
-//            try {
-//                if (timeCutDown > 0) {
-//                    --timeCutDown;
-//                    this.sendMessage("{\"number\":2,\"code\":3,\"time\":" + timeCutDown + ",\"state\":1}");
-//
-//                } else {
-//                    CommonData.isStart = false;
-//                    this.sendMessage("{\"number\":2,\"code\":3,\"time\":" + timeCutDown + ",\"state\":0}");
-//                    break;
-//                }
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-
         /**
          * 消息群发
          */
@@ -153,6 +132,7 @@ public class WebSocketController {
     public void onError(Session session, Throwable error) {
         System.out.println("发生错误");
         error.printStackTrace();
+        onClose();
     }
 
     /**
@@ -162,7 +142,13 @@ public class WebSocketController {
      * @throws IOException
      */
     public void sendMessage(String message) throws IOException {
-        this.session.getBasicRemote().sendText(message);
+        if (!this.session.isOpen()){
+            System.out.println("this.session为空");
+        }
+        else{
+            this.session.getBasicRemote().sendText(message);
+        }
+
     }
 
     /**
@@ -178,15 +164,13 @@ public class WebSocketController {
      * 在线+1
      */
     public static synchronized void addOnlineCount() {
-        onlineCount = WebSocketController.getOnlineCount();
-        onlineCount++;
+        WebSocketController.onlineCount++;
     }
 
     /**
      * 在线-1
      */
     public static synchronized void subOnlineCount() {
-        onlineCount = WebSocketController.getOnlineCount();
-        onlineCount--;
+        WebSocketController.onlineCount--;
     }
 }

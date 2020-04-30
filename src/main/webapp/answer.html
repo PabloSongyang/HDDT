@@ -93,51 +93,55 @@
 <div id="answer-container">
     <ul id="options-ul">
         <!--<li>-->
-            <!--<div class="option-container">-->
-                <!--<div class="option">C</div>-->
-                <!--<div class="result">-->
-                    <!--<img src="./image/Ture.png" width="30px">-->
-                <!--</div>-->
-            <!--</div>-->
+        <!--<div class="option-container">-->
+        <!--<div class="option">C</div>-->
+        <!--<div class="result">-->
+        <!--<img src="./image/True.png" width="30px">-->
+        <!--</div>-->
+        <!--</div>-->
         <!--</li>-->
         <!--<li>-->
-            <!--<div class="option-container">-->
-                <!--<div class="option">C</div>-->
-                <!--<div class="result">-->
-                    <!--<img src="./image/Ture.png" width="30px">-->
-                <!--</div>-->
-            <!--</div>-->
+        <!--<div class="option-container">-->
+        <!--<div class="option">C</div>-->
+        <!--<div class="result">-->
+        <!--<img src="./image/True.png" width="30px">-->
+        <!--</div>-->
+        <!--</div>-->
         <!--</li>-->
         <!--<li>-->
-            <!--<div class="option-container">-->
-                <!--<div class="option">C</div>-->
-                <!--<div class="result">-->
-                    <!--<img src="./image/Ture.png" width="30px">-->
-                <!--</div>-->
-            <!--</div>-->
+        <!--<div class="option-container">-->
+        <!--<div class="option">C</div>-->
+        <!--<div class="result">-->
+        <!--<img src="./image/True.png" width="30px">-->
+        <!--</div>-->
+        <!--</div>-->
 
 
         <!--</li>-->
         <!--<li>-->
-            <!--<div class="option-container">-->
-                <!--<div class="option">C</div>-->
-                <!--<div class="result">-->
-                    <!--<img src="./image/Ture.png" width="30px">-->
-                <!--</div>-->
-            <!--</div>-->
+        <!--<div class="option-container">-->
+        <!--<div class="option">C</div>-->
+        <!--<div class="result">-->
+        <!--<img src="./image/True.png" width="30px">-->
+        <!--</div>-->
+        <!--</div>-->
         <!--</li>-->
     </ul>
 </div>
+
 </body>
 <script type="text/javascript" src="./js/websocketUtil.js"></script>
 <script type="text/javascript" src="./js/touchEvent.js"></script>
+<script type="text/javascript" src="./js/generateUUID.js"></script>
 <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
+    var count = 0;
     var nikeName = $('#nike-name');
     var headImage = $('#head-image');
     var timeCutDown = $('#time-cut-down');
     var ulContainer = $('#options-ul');
-    var options = ["A", "B", "C", "D"];
+    var options = ["A", "B", "C", "D"]
+    var mySelect = 0;
 
     $(function () {
         onMessage(function (data) {
@@ -153,28 +157,31 @@
                         break;
                     //用户点击选项按钮
                     case 1003:
-                        ulContainer.off('click', clickEvent);
-                        ulContainer.on('click', 'li', clickEvent);
+                        // ulContainer.off('click', clickEvent);
+                        // ulContainer.on('click', 'li', clickEvent);
                         break;
                     //获取选项个数
                     case 1004:
+                        count++;
+                        $('#tips').text('第' + count + '题，请等待…');
                         ulContainer.empty();
                         for (var i = 0; i < Number(jsonData["data"]["questionCount"]); i++) {
                             var li = $('<li></li>');
                             var option_container = $('<div class="option-container"></div>');
                             var option = $('<div class="option"></div>').text(options[i]);
                             var result = $('<div class="result"></div>');
-                            var optionImg = $('<img/>').attr({'src': './image/Ture.png', 'width': "30px"});
+                            var optionImg = $('<img/>');
 
 
                             li.attr("id", i);
-                            result.css('display','none');
+                            result.css('display', 'none');
 
                             result.append(optionImg);
                             option_container.append(option).append(result);
                             li.append(option_container);
                             ulContainer.append(li);
                         }
+                        ulContainer.on('click', 'li', clickEvent);
                         break;
                     //获取倒计时信息
                     case 1005:
@@ -184,13 +191,19 @@
                     case 1006:
                         var index = 0;
                         for (let i = 0; i < options.length; i++) {
-                            if (jsonData["data"]["rightOption"].toString() == options[i]){
+                            if (jsonData["data"]["rightOption"].toString() == options[i]) {
                                 index = i;
                                 break;
                             }
                         }
+                        if (Number(mySelect) !== Number(index)){
+                            ulContainer.children('li').eq(mySelect).find('.result').eq(0).find('img').eq(0).attr({'src': './image/False.png', 'width': "30px"});
+                            ulContainer.children('li').eq(index).find('.result').eq(0).css('display', '');
+                            ulContainer.children('li').eq(mySelect).find('.result').eq(0).css('display', '');
+                        }
 
-                        ulContainer.children('li').eq(index).find('.result').eq(0).css('display','');
+                        ulContainer.children('li').eq(index).find('.result').eq(0).find('img').eq(0).attr({'src': './image/True.png', 'width': "30px"});
+                        ulContainer.children('li').eq(index).find('.result').eq(0).css('display', '');
                         break;
                 }
             }
@@ -202,7 +215,8 @@
     function clickEvent() {
 
         console.log($(this).index());
-        ulContainer.children('li').eq($(this).index()).children('div').css("background-color", "slategrey");
+        mySelect = $(this).index();
+        ulContainer.children('li').eq($(this).index()).find('.option').eq(0).css("background-color", "slategrey");
         send(JSON.stringify(answered(options[$(this).index()], 1)), 2);
         // var id = ulContainer.children('li').eq($(this).index()).attr('id');
         // for (var i = 0; i < ulContainer.children('li').length; i++) {
@@ -218,7 +232,7 @@
             code: 11,
             result: result,
             isAnswered: isAnswered,
-            sessionId: document.cookie
+            sessionId: UUID
         };
         return json;
     }
