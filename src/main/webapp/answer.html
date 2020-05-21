@@ -9,7 +9,7 @@
             border: 0;
             padding: 4%;
             margin: 0;
-            background-color: #FECA59FF;
+            background-color: #FECA59;
         }
 
         #head-container {
@@ -77,6 +77,38 @@
             clear: both;
             height: 50px;
         }
+
+        #rank {
+            height: 250px;
+        }
+
+        #bg {
+            width: 70%;
+            margin: 0 auto;
+            border-radius: 8px;
+            background-color: #FEDB8A;
+            height: 55%;
+            padding-top: 20px;
+        }
+
+        .option-text {
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+
+        }
+
+        #return-btn {
+            border: 2px solid #452E2C;
+            margin: 40px auto;
+            height: 40px;
+            width: 40%;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -92,41 +124,23 @@
 </div>
 <div id="answer-container">
     <ul id="options-ul">
-        <!--<li>-->
-        <!--<div class="option-container">-->
-        <!--<div class="option">C</div>-->
-        <!--<div class="result">-->
-        <!--<img src="./image/True.png" width="30px">-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</li>-->
-        <!--<li>-->
-        <!--<div class="option-container">-->
-        <!--<div class="option">C</div>-->
-        <!--<div class="result">-->
-        <!--<img src="./image/True.png" width="30px">-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</li>-->
-        <!--<li>-->
-        <!--<div class="option-container">-->
-        <!--<div class="option">C</div>-->
-        <!--<div class="result">-->
-        <!--<img src="./image/True.png" width="30px">-->
-        <!--</div>-->
-        <!--</div>-->
-
-
-        <!--</li>-->
-        <!--<li>-->
-        <!--<div class="option-container">-->
-        <!--<div class="option">C</div>-->
-        <!--<div class="result">-->
-        <!--<img src="./image/True.png" width="30px">-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</li>-->
     </ul>
+</div>
+
+<div id="rank">
+    <div id="bg">
+        <div id="answer-count" class="option-text">
+            题目数量：0
+        </div>
+        <div id="true-count" class="option-text">
+            答对数量：0
+        </div>
+        <div id="timeout-count" class="option-text">
+            超时数量：0
+        </div>
+
+    </div>
+    <div id="return-btn">退出</div>
 </div>
 
 </body>
@@ -140,84 +154,148 @@
     var headImage = $('#head-image');
     var timeCutDown = $('#time-cut-down');
     var ulContainer = $('#options-ul');
+    var rank = $('#rank');
     var options = ["A", "B", "C", "D"]
-    var mySelect = 0;
+    var mySelect = -1;
+    var isClick = false;
+    var score = 0;
+    var timeout_count = 0;
+
 
     $(function () {
-        onMessage(function (data) {
-            var jsonData = (JSON.parse(data));
-            if (jsonData.hasOwnProperty("code")) {
+        getParamFromUrl('uuid');
+        headImage.attr('src', getParamFromUrl('img'));
+        nikeName.text(getParamFromUrl('name'));
+        console.log(getParamFromUrl('uuid'));
+        rank.css('display', "none");
+        timeCutDown.css("display", "");
+        ulContainer.css("display", "");
 
-                switch (Number(jsonData["code"])) {
-                    //获取所有的题目数据
-                    case 1001:
-                        break;
-                    //获取所有的题目对应选项
-                    case 1002:
-                        break;
-                    //用户点击选项按钮
-                    case 1003:
-                        // ulContainer.off('click', clickEvent);
-                        // ulContainer.on('click', 'li', clickEvent);
-                        break;
-                    //获取选项个数
-                    case 1004:
-                        count++;
-                        $('#tips').text('第' + count + '题，请等待…');
-                        ulContainer.empty();
-                        for (var i = 0; i < Number(jsonData["data"]["questionCount"]); i++) {
-                            var li = $('<li></li>');
-                            var option_container = $('<div class="option-container"></div>');
-                            var option = $('<div class="option"></div>').text(options[i]);
-                            var result = $('<div class="result"></div>');
-                            var optionImg = $('<img/>');
+    });
 
 
-                            li.attr("id", i);
-                            result.css('display', 'none');
+    onMessage(function (data) {
+        var jsonData = (JSON.parse(data));
 
-                            result.append(optionImg);
-                            option_container.append(option).append(result);
-                            li.append(option_container);
-                            ulContainer.append(li);
+        if (jsonData.hasOwnProperty("code")) {
+
+            switch (Number(jsonData["code"])) {
+                //获取所有的题目数据
+                case 1001:
+                    // console.log("dsddsdsddsdsdaqdwwadawdfawfaswfwadwadawffawfdwadawdwafadwdad");
+                    break;
+                //获取所有的题目对应选项
+                case 1002:
+                    break;
+                //用户点击选项按钮
+                case 1003:
+                    // ulContainer.off('click', clickEvent);
+                    // ulContainer.on('click', 'li', clickEvent);
+                    break;
+                //获取选项个数
+                case 1004:
+                    count++;
+                    mySelect = -1;
+                    $('#tips').text('第' + count + '题，答题中…');
+                    isClick = false;
+                    ulContainer.empty();
+                    for (var i = 0; i < Number(jsonData["data"]["questionCount"]); i++) {
+                        var li = $('<li></li>');
+                        var option_container = $('<div class="option-container"></div>');
+                        var option = $('<div class="option"></div>').text(options[i]);
+                        var result = $('<div class="result"></div>');
+                        var optionImg = $('<img/>');
+
+
+                        li.attr("id", i);
+                        result.css('display', 'none');
+
+                        result.append(optionImg);
+                        option_container.append(option).append(result);
+                        li.append(option_container);
+                        ulContainer.append(li);
+                    }
+                    ulContainer.on('click', 'li', clickEvent);
+                    break;
+                //获取倒计时信息
+                case 1005:
+                    timeCutDown.text(jsonData["data"]["cutDown"] + 's');
+                    if (Number(jsonData["data"]["cutDown"]) === 0)
+                        ulContainer.off('click', 'li', clickEvent);
+                    break;
+                //获取当前题的正确选项
+                case 1006:
+                    var index = 0;
+                    for (let i = 0; i < options.length; i++) {
+                        if (jsonData["data"]["rightOption"].toString() == options[i]) {
+                            index = i;
+                            break;
                         }
-                        ulContainer.on('click', 'li', clickEvent);
-                        break;
-                    //获取倒计时信息
-                    case 1005:
-                        timeCutDown.text(jsonData["data"]["cutDown"] + 's');
-                        break;
-                    //获取当前题的正确选项
-                    case 1006:
-                        var index = 0;
-                        for (let i = 0; i < options.length; i++) {
-                            if (jsonData["data"]["rightOption"].toString() == options[i]) {
-                                index = i;
-                                break;
-                            }
-                        }
-                        if (Number(mySelect) !== Number(index)){
-                            ulContainer.children('li').eq(mySelect).find('.result').eq(0).find('img').eq(0).attr({'src': './image/False.png', 'width': "30px"});
+                    }
+
+                    console.log("我的选项：==>> " + mySelect + "----正确选项： ==>> " + index);
+                    if (Number(mySelect) !== Number(index)) {
+                        if (Number(mySelect) === -1) {
+                            score = score;
+                            timeout_count = timeout_count + 1;
+                            send(JSON.stringify(answered('false', 0, score, count, timeout_count)), 2);
+                        } else {
+                            ulContainer.children('li').eq(mySelect).find('.result').eq(0).find('img').eq(0).attr({
+                                'src': './image/False.png',
+                                'width': "30px"
+                            });
                             ulContainer.children('li').eq(index).find('.result').eq(0).css('display', '');
                             ulContainer.children('li').eq(mySelect).find('.result').eq(0).css('display', '');
+                            score = score;
+                            timeout_count = timeout_count;
+                            send(JSON.stringify(answered("false", 1, score, count, timeout_count)), 2);
                         }
+                    } else if (Number(mySelect) === Number(index)) {
+                        score = score + 1;
+                        timeout_count = timeout_count;
+                        send(JSON.stringify(answered("true", 1, score, count, timeout_count)), 2);
+                    }
 
-                        ulContainer.children('li').eq(index).find('.result').eq(0).find('img').eq(0).attr({'src': './image/True.png', 'width': "30px"});
-                        ulContainer.children('li').eq(index).find('.result').eq(0).css('display', '');
-                        break;
-                }
+                    ulContainer.children('li').eq(index).find('.result').eq(0).find('img').eq(0).attr({
+                        'src': './image/True.png',
+                        'width': "30px"
+                    });
+                    ulContainer.children('li').eq(index).find('.result').eq(0).css('display', '');
+                    break;
+                //答题结束获取排名
+                case 1007:
+                    timeCutDown.css("display", "none");
+                    ulContainer.css("display", "none");
+                    rank.css('display', "");
+                    $('#tips').text('');
+                    $('#answer-count').text('题目数量：' + count);
+                    $('#true-count').text('答对数量：' + score);
+                    $('#timeout-count').text('超时数量：' + timeout_count);
+                    $('#return-btn').click(function () {
+                        window.open('http://192.168.31.168:8081/HDDTProject', '_blank');
+                        window.close();
+                    });
+                    break;
+                //断开连接
+                case 1008:
+                    // window.location.href = "index.html";
+
+                    break;
             }
-
-        });
+        }
 
     });
 
     function clickEvent() {
+        if (!isClick) {
+            console.log($(this).index());
+            mySelect = $(this).index();
+            ulContainer.children('li').eq($(this).index()).find('.option').eq(0).css("background-color", "slategrey");
+            send(JSON.stringify(curAns()));
+            // send(JSON.stringify(answered(options[$(this).index()], 1)), 2);
+            isClick = true;
+        }
 
-        console.log($(this).index());
-        mySelect = $(this).index();
-        ulContainer.children('li').eq($(this).index()).find('.option').eq(0).css("background-color", "slategrey");
-        send(JSON.stringify(answered(options[$(this).index()], 1)), 2);
         // var id = ulContainer.children('li').eq($(this).index()).attr('id');
         // for (var i = 0; i < ulContainer.children('li').length; i++) {
         //     if (id != ulContainer.children('li').eq(i).attr('id')){
@@ -227,14 +305,52 @@
         // }
     }
 
-    function answered(result, isAnswered) {
+
+    function getUUID() {
+        var uuid;
+        var url = window.location.href;
+        if (url.indexOf('?') != -1) {
+            uuid = url.split('?')[1]
+        }
+        return uuid;
+    }
+
+    function curAns() {
+        var json = {
+            code: 13
+        };
+        return json;
+    }
+
+    function answered(result, isAnswered, score, answer_count, timeout_count) {
         var json = {
             code: 11,
             result: result,
             isAnswered: isAnswered,
-            sessionId: UUID
+            uuid: getParamFromUrl('uuid'),
+            number: score,
+            answer_count: answer_count,
+            timeout_count: timeout_count
         };
         return json;
+    }
+
+    function getParamFromUrl(key) {
+        var param = '';
+        var params = new Array();
+        var url = window.location.href;
+        if (url.indexOf('?') !== -1) {
+            var totalParam = url.split('?')[1];
+
+            params = totalParam.split('&');
+            for (var i = 0; i < params.length; i++) {
+                if (key === params[i].split('=')[0]) {
+                    param = params[i].split('=')[1]
+                }
+            }
+        }
+
+        return decodeURIComponent(param);
     }
 </script>
 </html>

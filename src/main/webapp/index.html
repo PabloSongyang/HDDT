@@ -9,6 +9,7 @@
             border: 0;
             padding: 4%;
             margin: 0;
+            background-color: #FECA59;
         }
 
         #head-container {
@@ -47,23 +48,52 @@
 <script type="text/javascript" src="./js/generateUUID.js"></script>
 <script type="text/javascript" src="./js/websocketUtil.js"></script>
 <script type="text/javascript" src="./js/touchEvent.js"></script>
+<script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="./js/layer-v3.1.1/layer/layer.js"></script>
 <script type="text/javascript">
-    var name = "pablo" + Math.round(Math.random() * 50)
-    window.onload = function () {
+    // var name = "pablo" + Math.round(Math.random() * 50)
+    var name;
+    var url = "http://192.168.31.168:8081/HDDTProject";
+    var image = '';
+
+
+    $(function () {
+        layer.msg("加入游戏大厅，请等待游戏开始",{icon:1,time:2500});
+        $.ajax({
+            url: 'ajax/ajax_get_msg',
+            dataType: 'json',
+            type:'GET'
+
+        }).done(function (data) {
+            if (data.code == 1){
+
+
+            }
+
+        });
+        name = getParamFromUrl('nikeName');
+        image = url + getParamFromUrl('photo');
+        $('#nike-name').text(name);
+        $('#head-image').attr('src',image);
+        // console.log((getParamFromUrl('nikeName')))
+        // name = decodeURIComponent(getParamFromUrl('nikeName'));
+        // document.getElementById('nike-name').innerText = name;
+
+
+        // document.getElementById('head-image').setAttribute('src', image);
+
 
         send(JSON.stringify(jsonTest(2, name, 'insert')), 1);
-
         onMessage(function (data) {
             var jsonData = (JSON.parse(data));
             if (jsonData.hasOwnProperty("code")) {
-                if (Number(jsonData["code"]) == 1003) {
-                    window.location.href = "answer.html";
+                if (Number(jsonData["code"]) === 1003) {
+                    window.location.href = "answer.html?" + 'name=' + encodeURIComponent(name) + '&' + 'uuid=' + UUID + '&' + 'img=' + image;
                 }
             }
         });
+    });
 
-
-    };
 
     window.onunload = function (ev) {
         send(JSON.stringify(jsonTest(0, name, 'delete')), 2)
@@ -77,12 +107,30 @@
                 user: {
                     uuid: UUID,
                     name: username,
-                    imageUri: "http://192.168.31.168:8081/HDDTProject/image/P_XNH_04.png"
+                    imageUri: image
                 }
             }
         };
 
         return user;
+    }
+
+    function getParamFromUrl(key) {
+        var param = '';
+        var params = new Array();
+        var url = decodeURIComponent(window.location.href);
+        if (url.indexOf('?') !== -1) {
+            var totalParam = url.split('?')[1];
+
+            params = totalParam.split('&');
+            for (var i = 0; i < params.length; i++) {
+                if (key === params[i].split('=')[0]) {
+                    param = params[i].split('=')[1]
+                }
+            }
+        }
+
+        return decodeURIComponent(param);
     }
 </script>
 </html>

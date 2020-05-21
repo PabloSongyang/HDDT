@@ -1,5 +1,12 @@
 package com.creative.answer.common;
 
+import com.creative.answer.bean.RankBean;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Pablo.风暴洋
  * @company 大连创模科技
@@ -12,4 +19,11 @@ public class CommonData {
     public static int timeCutDown = 20;
     public static boolean isStart = false;
     public static String big_screen = "";
+    public static int playerNumber = 0;
+    public static int hall_status = 0;
+
+    public static Map<String,Object> rankMap = new HashMap<>();
+    public static List<Map<String, Object>> rankMapList = new ArrayList<>();
+    public static List<RankBean> rankBeanList = new ArrayList<>();
+
 }

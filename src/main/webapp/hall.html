@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <title>互动答题</title>
+    <style>
+        body {
+            border: 0;
+            padding: 4%;
+            margin: 0;
+            background-color: #FECA59;
+        }
+
+        #head-container {
+            text-align: center;
+            /*border: 1px solid firebrick;*/
+            width: 190px;
+            padding-bottom: 10px;
+            margin: 30px auto;
+        }
+
+        #head-image {
+            max-width: 190px;
+            max-height: 190px;
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+        }
+
+        input {
+
+        }
+
+        #nike-name {
+            text-align: center;
+            margin: 0 auto;
+            background-color: transparent;
+            outline: none;
+            border: 1px solid gray;
+            border-radius: 10px;
+            height: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input[type='button'], input[type='file'] {
+            background-color: transparent;
+            outline: none;
+            border: 1px solid gray;
+            border-radius: 10px;
+            color: gray;
+        }
+
+        #upload {
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+
+        #join-btn {
+            height: 30px;
+            width: 80%;
+            border: 1px solid black;
+            color: black;
+        }
+
+        #head-btn {
+            border: 1px solid gray;
+            height: 25px;
+            width: 40%;
+            margin: 20px auto 130px;
+            font-size: 14px;
+            line-height: 25px;
+            border-radius: 10px;
+            color: gray;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+<div id="head-container">
+    <input type="text" placeholder="添加昵称" id="nike-name"><br><br><br>
+    <img src="./image/P_XNH_04.png" id="head-image"/><br>
+    <div id="head-btn">
+        更换头像<input type="file" accept="image/*" id="upload" value=""/><br><br><br><br><br><br><br><br>
+    </div>
+
+    <input type="button" id="join-btn" value="加入游戏"/>
+</div>
+</body>
+<script type="text/javascript" src="./js/touchEvent.js"></script>
+<script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="./js/layer-v3.1.1/layer/layer.js"></script>
+<script type="text/javascript">
+    var nike_name = $('#nike-name');
+    var head_image = $('#head-image');
+    var head_btn = $('#head-btn');
+    var join_btn = $('#join-btn');
+    var image;
+    $(function () {
+        nike_name.text('');
+        // head_btn.attr('src','./image/P_XNH_04.png');
+        nike_name.blur(function () {
+            $(this).css('border', '1px solid transparent');
+
+        });
+
+        nike_name.click(function () {
+            $(this).css('border', '1px solid gray');
+        });
+
+        $('#upload').change(function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                head_image.attr('src', e.target.result);
+            };
+            var uri = $(this).val();
+            image = uri.substring(uri.lastIndexOf("\\") + 1, uri.length);
+
+            reader.readAsDataURL(file);
+        });
+
+
+        join_btn.click(function () {
+            if (nike_name.val() == '') {
+                layer.msg('请输入昵称', {icon: 5, time: 1000});
+                return;
+            } else if (nike_name.val().length > 6) {
+                layer.msg('昵称限定6个字符', {icon: 5, time: 1000});
+                return;
+            }
+            if (image == undefined) {
+                layer.msg('请上传头像', {icon: 5, time: 1000});
+                return;
+            }
+
+            $.ajax({
+                url: 'ajax/ajax_set_msg',
+                data: setFormData(
+                    nike_name.val(),
+                    $('#upload')[0].files[0],
+                    Number(1)
+                ),
+                dateType: 'json',
+                type: 'POST',
+                processData: false,
+                contentType: false
+            }).done(function (data) {
+                var result = JSON.parse(data);
+                if (result['code'] == 1) {
+                    // window.location.href = "index.html?photo=" + result['photo'];
+
+                    window.location.href = "index.html?" + 'nikeName=' + encodeURIComponent(result['nikeName'].toString()) + '&' + 'photo=' + result['photo'];
+                }
+            });
+
+
+        });
+    });
+
+    function setFormData(v1, v2, v3) {
+        var f = new FormData();
+        f.append('nikeName', v1);
+        f.append('photo', v2);
+        f.append('code', v3);
+        return f;
+    }
+</script>
+</html>

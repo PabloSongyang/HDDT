@@ -9,11 +9,27 @@ package com.creative.answer.bean;
  */
 public class QuestionFromUnityBean {
     public int code;
+    public String result;
+    public Integer number;
+    public int isAnswered;
+    public String uuid;
     public Data data;
 
     public static class Data{
         public String Count;
         public String id;
         public String status;
+        public User user;
+        public String playerNumber;
+        public String isEnd;
+
+
+        public static class User{
+            public String uuid;
+            public String name;
+            public String imageUri;
+        }
     }
+
+
 }

@@ -38,10 +38,10 @@ public class WebSocketController {
 
 
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
+    public static int onlineCount = 0;
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
-    private static CopyOnWriteArraySet<WebSocketController> webSocketManagerCopyOnWriteArraySet = new CopyOnWriteArraySet<>();
+    public static CopyOnWriteArraySet<WebSocketController> webSocketManagerCopyOnWriteArraySet = new CopyOnWriteArraySet<>();
 
     //
     private static Map<String, HttpSession> socketNumb = new ConcurrentHashMap<>();
@@ -102,9 +102,9 @@ public class WebSocketController {
     @OnMessage
     public void onMessage(String message, Session session) {
         System.out.println("收到来自客户端的消息：" + message);
-        String json = QuestionController.getInstance().onMessage(message, session);
+        String json = QuestionController.getInstance().onMessage(message);
         try {
-            this.sendMessage(json);
+            this.sendMessage(session, json);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,12 +112,17 @@ public class WebSocketController {
         /**
          * 消息群发
          */
-        for (WebSocketController webSocketManager : webSocketManagerCopyOnWriteArraySet) {
-            try {
-                webSocketManager.sendMessage(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-                continue;
+        if (webSocketManagerCopyOnWriteArraySet.size() != 0) {
+            for (WebSocketController webSocketManager : webSocketManagerCopyOnWriteArraySet) {
+                if (webSocketManager != null) {
+                    try {
+                        if (this.session != webSocketManager.session)
+                            webSocketManager.sendMessage(webSocketManager.session, message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                }
             }
         }
     }
@@ -136,19 +141,27 @@ public class WebSocketController {
     }
 
     /**
-     * 发送消息
+     * 发送消息(针对服务器向终端和web端群发)
      *
      * @param message
      * @throws IOException
      */
-    public void sendMessage(String message) throws IOException {
-        if (!this.session.isOpen()){
-            System.out.println("this.session为空");
+    public void sendMessage(Session session, String message) throws IOException {
+        synchronized (session) {
+            session.getBasicRemote().sendText(message);
         }
-        else{
+    }
+
+    /**
+     * 发送消息(针对web端向服务器或终端单独通知)
+     *
+     * @param message
+     * @throws IOException
+     */
+    public void sendSingleMessage(String message) throws IOException {
+        synchronized (this.session) {
             this.session.getBasicRemote().sendText(message);
         }
-
     }
 
     /**
