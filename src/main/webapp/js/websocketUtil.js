@@ -18,8 +18,12 @@ getUserIP(function (ip) {
 
 function createWebSocket() {
     try {
+
         websocket = new WebSocket(websocketUrl);
+        console.log("已经创建连接对象");
         init();
+
+
     } catch (e) {
         console.log('catch');
         reconnect(websocketUrl);
@@ -51,6 +55,10 @@ function init() {
         };
         closeWebSocket();
     };
+}
+
+function isConn() {
+    return websocket.readyState === websocket.CONNECTING;
 }
 
 /**
@@ -209,17 +217,18 @@ var heartCheck = {
         var self = this;
         this.timeoutObj && clearTimeout(this.timeoutObj);
         this.serverTimeoutObj && clearTimeout(this.serverTimeoutObj);
-        this.timeoutObj = setTimeout(function () {
-            //这里发送一个心跳，后端收到后，返回一个心跳消息，
-            //onmessage拿到返回的心跳就说明连接正常
-            websocket.send('{"Web":"Heart rate normal"}');
-            self.serverTimeoutObj = setTimeout(function () {
-                console.log(websocket);
-                websocket.close();
-                // createWebSocket();
-            }, self.timeout);
+        this.timeoutObj =
+            (function () {
+                //这里发送一个心跳，后端收到后，返回一个心跳消息，
+                //onmessage拿到返回的心跳就说明连接正常
+                websocket.send('{"Web":"Heart rate normal"}');
+                self.serverTimeoutObj = setTimeout(function () {
+                    console.log(websocket);
+                    websocket.close();
+                    // createWebSocket();
+                }, self.timeout);
 
-        }, this.timeout)
+            }, this.timeout)
     }
 };
 

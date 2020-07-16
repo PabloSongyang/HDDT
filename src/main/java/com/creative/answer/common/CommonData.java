@@ -2,10 +2,7 @@ package com.creative.answer.common;
 
 import com.creative.answer.bean.RankBean;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Pablo.风暴洋
@@ -25,5 +22,6 @@ public class CommonData {
     public static Map<String,Object> rankMap = new HashMap<>();
     public static List<Map<String, Object>> rankMapList = new ArrayList<>();
     public static List<RankBean> rankBeanList = new ArrayList<>();
+    public static List<String> roomIdList = new ArrayList<>();
 
 }

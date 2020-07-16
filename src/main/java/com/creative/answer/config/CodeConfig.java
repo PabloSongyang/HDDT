@@ -25,4 +25,7 @@ public class CodeConfig {
 
     //中途退出游戏
     public static final int EXIT_GAME              = 1008;
+
+    //房间控制
+    public static final int ROOM_CTRL              = 1010;
 }

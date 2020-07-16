@@ -181,7 +181,7 @@ public class QuestionController extends BaseController {
                         super.getResultMap().put("msg", "ok");
                         super.getResultMap().put("code", 9);
                         super.getResultMap().put("flag", CodeConfig.GET_ALL_OPTIONS);
-                        super.getResultMap().put("all_question",questionBeanList);
+                        super.getResultMap().put("all_question", questionBeanList);
                         super.getResultMap().put("option", answerBeanList);
                         super.getResultMap().put("rank", CommonData.rankBeanList);
                     }
@@ -214,6 +214,20 @@ public class QuestionController extends BaseController {
                     System.out.println("Unity端关闭，当前在线人数为：" + WebSocketController.getOnlineCount());
 
                     break;
+                case CodeConfig.ROOM_CTRL:
+                    super.getResultMap().clear();
+                    if (o.data.roomId != null) {
+                        CommonData.roomIdList.add(o.data.roomId);
+                    }
+                    super.getResultMap().put("msg", "ok");
+                    super.getResultMap().put("code", 16);
+                    super.getResultMap().put("roomIdList", CommonData.roomIdList);
+                    sendJson = gson.toJson(super.getResultMap());
+                    System.out.println(sendJson);
+
+
+                    break;
+
             }
         }
         return sendJson;

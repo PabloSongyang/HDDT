@@ -92,6 +92,7 @@
 </div>
 </body>
 <script type="text/javascript" src="./js/touchEvent.js"></script>
+<!--<script type="text/javascript" src="./js/websocketUtil.js"></script>-->
 <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="./js/layer-v3.1.1/layer/layer.js"></script>
 <script type="text/javascript">
@@ -100,7 +101,21 @@
     var head_btn = $('#head-btn');
     var join_btn = $('#join-btn');
     var image;
+
+    var roomId;
     $(function () {
+        // onMessage(function (data) {
+        //     var jsonData = (JSON.parse(data));
+        //     if (jsonData.hasOwnProperty("code")) {
+        //         if (Number(jsonData["code"]) === 1010) {
+        //             roomId = jsonData["data"]["roomId"].toString();
+        //             console.log(roomId);
+        //         }
+        //     }
+        // });
+
+        roomId = getParamFromUrl('roomId');
+
         nike_name.text('');
         // head_btn.attr('src','./image/P_XNH_04.png');
         nike_name.blur(function () {
@@ -124,8 +139,14 @@
             reader.readAsDataURL(file);
         });
 
+        setInterval(function () {
+
+
+        }, 500);
+
 
         join_btn.click(function () {
+
             if (nike_name.val() == '') {
                 layer.msg('请输入昵称', {icon: 5, time: 1000});
                 return;
@@ -137,6 +158,13 @@
                 layer.msg('请上传头像', {icon: 5, time: 1000});
                 return;
             }
+
+
+            if (roomId === '') {
+                layer.msg('没有开房间，玩不了', {icon: 5, time: 1000});
+                return;
+            }
+
 
             $.ajax({
                 url: 'ajax/ajax_set_msg',
@@ -154,7 +182,7 @@
                 if (result['code'] == 1) {
                     // window.location.href = "index.html?photo=" + result['photo'];
 
-                    window.location.href = "index.html?" + 'nikeName=' + encodeURIComponent(result['nikeName'].toString()) + '&' + 'photo=' + result['photo'];
+                    window.location.href = "index.html?" + 'nikeName=' + encodeURIComponent(result['nikeName'].toString()) + '&' + 'photo=' + result['photo'] + '&' + 'roomId=' + roomId;
                 }
             });
 
@@ -168,6 +196,24 @@
         f.append('photo', v2);
         f.append('code', v3);
         return f;
+    }
+
+    function getParamFromUrl(key) {
+        var param = '';
+        var params = new Array();
+        var url = decodeURIComponent(window.location.href);
+        if (url.indexOf('?') !== -1) {
+            var totalParam = url.split('?')[1];
+
+            params = totalParam.split('&');
+            for (var i = 0; i < params.length; i++) {
+                if (key === params[i].split('=')[0]) {
+                    param = params[i].split('=')[1]
+                }
+            }
+        }
+
+        return decodeURIComponent(param);
     }
 </script>
 </html>

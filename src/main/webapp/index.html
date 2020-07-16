@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
     <title>互动答题</title>
+
     <style>
         body {
             border: 0;
@@ -33,9 +34,25 @@
         #tips {
             text-align: center;
         }
+
+        #refresh-btn{
+            height: 30px;
+            width: 80%;
+            border: 1px solid black;
+            color: black;
+        }
+
+        input[type='button'], input[type='file'] {
+            background-color: transparent;
+            outline: none;
+            border: 1px solid gray;
+            border-radius: 10px;
+            color: gray;
+        }
     </style>
 </head>
 <body>
+
 <div id="head-container">
     <h3 id="nike-name">昵称</h3>
     <img src="./image/P_XNH_04.png" id="head-image"/>
@@ -44,28 +61,42 @@
 <div id="tips">
     请等待开始答题……
 </div>
+
+<!--<input type="button" id="refresh-btn" value="刷新"/>-->
 </body>
-<script type="text/javascript" src="./js/generateUUID.js"></script>
 <script type="text/javascript" src="./js/websocketUtil.js"></script>
+<script type="text/javascript" src="./js/generateUUID.js"></script>
 <script type="text/javascript" src="./js/touchEvent.js"></script>
 <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="./js/layer-v3.1.1/layer/layer.js"></script>
 <script type="text/javascript">
-    // var name = "pablo" + Math.round(Math.random() * 50)
     var name;
     var url = "http://192.168.31.168:8081/HDDTProject";
     var image = '';
+    var roomId;
+    var playerRoomId;
 
+    window.onload =function (ev) {
+
+    };
 
     $(function () {
-        layer.msg("加入游戏大厅，请等待游戏开始",{icon:1,time:2500});
+        // $('#refresh-btn').click(function () {
+        //     window.location.reload();
+
+        // });
+
+        layer.msg("加入游戏大厅，请等待游戏开始", {icon: 1, time: 2500});
+        layer.msg('isConn -->> ' + isConn(), {icon: 1, time: 2500});
+
+
         $.ajax({
             url: 'ajax/ajax_get_msg',
             dataType: 'json',
-            type:'GET'
+            type: 'GET'
 
         }).done(function (data) {
-            if (data.code == 1){
+            if (data.code == 1) {
 
 
             }
@@ -74,7 +105,7 @@
         name = getParamFromUrl('nikeName');
         image = url + getParamFromUrl('photo');
         $('#nike-name').text(name);
-        $('#head-image').attr('src',image);
+        $('#head-image').attr('src', image);
         // console.log((getParamFromUrl('nikeName')))
         // name = decodeURIComponent(getParamFromUrl('nikeName'));
         // document.getElementById('nike-name').innerText = name;
@@ -83,23 +114,49 @@
         // document.getElementById('head-image').setAttribute('src', image);
 
 
-        send(JSON.stringify(jsonTest(2, name, 'insert')), 1);
+        send(JSON.stringify(joinIn(2, name, 'insert')), 1);
+        console.log(JSON.stringify(joinIn(2, name, 'insert')));
+        console.log(name);
+
         onMessage(function (data) {
             var jsonData = (JSON.parse(data));
             if (jsonData.hasOwnProperty("code")) {
-                if (Number(jsonData["code"]) === 1003) {
+
+                if (Number(jsonData["code"]) === 1011) {
+                    if (jsonData["data"]["users"].length > 0) {
+                        for (var i = 0; i < jsonData["data"]["users"].length; i++) {
+                            if (UUID == jsonData["data"]["users"][i].uuid) {
+                                playerRoomId = jsonData["data"]["users"][i]["roomId"]
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                console.log(playerRoomId);
+                if (Number(jsonData["code"]) === 1010) {
+                    roomId = jsonData["data"]["roomId"].toString();
+                    console.log(roomId);
+                    if (roomId === ('00000-' + playerRoomId)) {
+                        layer.msg('大屏幕关闭', {icon: 5, time: 1000});
+                        window.location.href = "hall.html";
+                    }
+                }
+                console.log(getParamFromUrl('roomId'));
+                if (Number(jsonData["code"]) === 1003 && getParamFromUrl('roomId') === playerRoomId) {
                     window.location.href = "answer.html?" + 'name=' + encodeURIComponent(name) + '&' + 'uuid=' + UUID + '&' + 'img=' + image;
                 }
             }
         });
+
     });
 
 
     window.onunload = function (ev) {
-        send(JSON.stringify(jsonTest(0, name, 'delete')), 2)
+        send(JSON.stringify(joinIn(0, name, 'delete')), 2)
     };
 
-    function jsonTest(code, username, type) {
+    function joinIn(code, username, type) {
         var user = {
             code: code,
             data: {
@@ -107,7 +164,8 @@
                 user: {
                     uuid: UUID,
                     name: username,
-                    imageUri: image
+                    imageUri: image,
+                    roomId: getParamFromUrl('roomId')
                 }
             }
         };

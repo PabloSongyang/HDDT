@@ -22,12 +22,13 @@ public class QuestionFromUnityBean {
         public User user;
         public String playerNumber;
         public String isEnd;
-
+        public String roomId;
 
         public static class User{
             public String uuid;
             public String name;
             public String imageUri;
+            public String roomId;
         }
     }
 
