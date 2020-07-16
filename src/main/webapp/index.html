@@ -142,8 +142,8 @@
                         window.location.href = "hall.html";
                     }
                 }
-                console.log(getParamFromUrl('roomId'));
-                if (Number(jsonData["code"]) === 1003 && getParamFromUrl('roomId') === playerRoomId) {
+                console.log(roomId);
+                if (Number(jsonData["code"]) === 1003 && roomId == playerRoomId) {
                     window.location.href = "answer.html?" + 'name=' + encodeURIComponent(name) + '&' + 'uuid=' + UUID + '&' + 'img=' + image;
                 }
             }

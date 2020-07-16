@@ -29,8 +29,8 @@ public class DataBaseConfig {
 
     //SqlServer连接必要信息
     public static final String SQLSERVER_URL          = "jdbc:sqlserver://localhost:1433;DatabaseName=cmkj_box_native";
-    public static final String SQLSERVER_USER            = "sa";
-    public static final String SQLSERVER_PASSWORD        = "sqlserverroot";
+    public static final String SQLSERVER_USER         = "sa";
+    public static final String SQLSERVER_PASSWORD     = "cmkj@CMKJ";//71服务器"cmkj@CMKJ"  本地"sqlserverroot"
 
 
 
