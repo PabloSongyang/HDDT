@@ -307,13 +307,13 @@
                     ulContainer.css("display", "none");
                     rank.css('display', "");
                     $('#tips').text('');
-                    $('#answer-count').text('题目数量：' + count);
+                    $('#answer-count').text('题目数量：' + jsonData["data"]["questionNumber"]);
                     $('#true-count').text('答对数量：' + score);
                     $('#timeout-count').text('超时数量：' + timeout_count);
                     $('#return-btn').click(function () {
                         // window.open('http://192.168.31.168:8081/HDDTProject', '_blank');
                         // window.close();
-                        location.replace('http://192.168.31.168:8081/HDDTProject?roomId=""&a=0');
+                        location.replace('http://218.61.208.71:8088/HDDTProject?roomId=""&a=0');
                         // window.location.href = 'http://192.168.31.168:8081/HDDTProject';
                     });
                     $('#xuanchuantu').click(function () {

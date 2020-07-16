@@ -28,7 +28,7 @@ public class DataBaseConfig {
     public static final String SQLSERVER_DRIVER_CLASS = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     //SqlServer连接必要信息
-    public static final String SQLSERVER_URL          = "jdbc:sqlserver://localhost:1433;DatabaseName=cmkj_box_native";
+    public static final String SQLSERVER_URL          = "jdbc:sqlserver://218.61.208.71:1433;DatabaseName=cmkj_box_native";
     public static final String SQLSERVER_USER         = "sa";
     public static final String SQLSERVER_PASSWORD     = "cmkj@CMKJ";//71服务器"cmkj@CMKJ"  本地"sqlserverroot"
 
