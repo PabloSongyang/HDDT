@@ -1,4 +1,5 @@
-var serverIp = "218.61.208.71:8088";//服务器"218.61.208.71:8088"  //本地"192.168.31.168:8081"
+// var serverIp = "218.61.208.71:8088";
+serverIp = "192.168.31.168:8081";
 var websocketUrl = "ws://" + serverIp + "/HDDTProject/websocket";
 /**
  *  @author Pablo.风暴洋

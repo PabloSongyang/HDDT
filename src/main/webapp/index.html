@@ -35,7 +35,7 @@
             text-align: center;
         }
 
-        #refresh-btn{
+        #refresh-btn {
             height: 30px;
             width: 80%;
             border: 1px solid black;
@@ -71,12 +71,13 @@
 <script type="text/javascript" src="./js/layer-v3.1.1/layer/layer.js"></script>
 <script type="text/javascript">
     var name;
-    var url = "http://218.61.208.71:8088/HDDTProject";  //218.61.208.71:8088  //192.168.31.168:8081
+    // var url = "http://218.61.208.71:8088/HDDTProject";
+    var url = "http://" + serverIp + "/HDDTProject";
     var image = '';
     var roomId;
     var playerRoomId;
 
-    window.onload =function (ev) {
+    window.onload = function (ev) {
 
     };
 

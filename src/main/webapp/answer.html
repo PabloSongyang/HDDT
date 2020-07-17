@@ -178,6 +178,7 @@
     var options = ["A", "B", "C", "D"]
     var mySelect = -1;
     var isClick = false;
+    var isSelect = false;
     var score = 0;
     var timeout_count = 0;
     var roomId;
@@ -195,8 +196,9 @@
         ulContainer.css("display", "");
 
         ulContainer.on('click', 'li', function () {
-            if (!isClick) {
+            if (!isSelect) {
                 send(JSON.stringify(selected()), 2);
+                isSelect = true;
             }
         });
 
@@ -248,7 +250,7 @@
                     break;
                 //获取选项个数
                 case 1004:
-
+                    isSelect = false;
                     init(Number(jsonData["data"]["questionCount"]));
                     break;
                 //获取倒计时信息
@@ -313,7 +315,8 @@
                     $('#return-btn').click(function () {
                         // window.open('http://192.168.31.168:8081/HDDTProject', '_blank');
                         // window.close();
-                        location.replace('http://218.61.208.71:8088/HDDTProject?roomId=""&a=0');
+                        // location.replace('http://218.61.208.71:8088/HDDTProject?roomId=""&a=0');
+                        location.replace('http://' + serverIp + '/HDDTProject?roomId=""&a=0');
                         // window.location.href = 'http://192.168.31.168:8081/HDDTProject';
                     });
                     $('#xuanchuantu').click(function () {
